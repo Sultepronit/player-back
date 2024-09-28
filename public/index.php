@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once './db/crud.php';
+
 header('Access-Control-Allow-Origin: *');
 
 if(!isset($_SERVER['REQUEST_METHOD']) || $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -23,6 +25,8 @@ if($method === 'GET' && $path === '/list') {
 if ($method === 'GET' && str_starts_with($path, '/files')) {
     $filePath = str_replace('/files', $audioDir, $path);
 
+    $filePath = str_replace('_', '.', $filePath);
+
     if (!file_exists($filePath)) {
         echo 'Nothing here!';
         exit;
@@ -39,20 +43,27 @@ if ($method === 'GET' && str_starts_with($path, '/files')) {
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_FILES['file'])) {
-        $file = $_FILES['file'];
-        $fileName = str_replace(' ', '_', $file['name']);
-        $destination = __DIR__ . "/audio/{$fileName}";
-        print_r($file);
-        echo PHP_EOL;
-        print_r($destination);
-        echo PHP_EOL;
-        if (move_uploaded_file($file['tmp_name'], $destination)) {
-            echo 'Success!';
-        } else {
-            echo 'Failed!';
-        }
+if($method === 'POST' && $path === '/upload') {
+    if (!isset($_FILES['file'])) {
+        echo 'What was that???';
+        exit;
     }
-    exit;
+
+    $file = $_FILES['file'];
+    $fullPath = $file['full_path'];
+
+    $extensionStart = strrpos($fullPath, '.');
+    $originalName = substr($fullPath, 0, $extensionStart);
+    $extension = strtolower(substr($fullPath, $extensionStart + 1));
+
+    $inserted = addEntry($extension, $originalName);
+
+    $fileName = "{$inserted['id']}.{$extension}";
+    $destination = __DIR__ . "/audio/{$fileName}";
+
+    if (move_uploaded_file($file['tmp_name'], $destination)) {
+        echo "Saved the {$fullPath} as {$fileName}";
+    } else {
+        echo 'Failed to save!';
+    }
 }
