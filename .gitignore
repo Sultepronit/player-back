@@ -1,1 +1,3 @@
 public/audio
+**/db-env.php
+**/dev-db.sqlite

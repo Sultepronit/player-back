@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once './db/crud.php';
+require_once 'db/crud.php';
 
 header('Access-Control-Allow-Origin: *');
 

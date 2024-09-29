@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 
-$pdo = new PDO('sqlite:' . __DIR__ . '/db.sqlite');
+require_once 'db-env.php';
+
+$pdo = new PDO('sqlite:' . __DIR__ . '/' . $dbName);
 
 $dropTable = "DROP TABLE IF EXISTS playlist";
 $pdo->exec($dropTable);
