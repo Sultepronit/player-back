@@ -56,14 +56,31 @@ if($method === 'POST' && $path === '/upload') {
     $originalName = substr($fullPath, 0, $extensionStart);
     $extension = strtolower(substr($fullPath, $extensionStart + 1));
 
-    $inserted = addEntry($extension, $originalName);
+    $previous = getLastEntry();
+    if (isset($previous['id'])) {
+        $id = $previous['id'] + 1;
+    } else if ($previous === false) {
+        $id = 1;
+    } else {
+        http_response_code(500);
+        echo $previous;
+        
+        exit;
+    }
 
-    $fileName = "{$inserted['id']}.{$extension}";
+    $fileName = "{$id}.{$extension}";
     $destination = __DIR__ . "/audio/{$fileName}";
 
     if (move_uploaded_file($file['tmp_name'], $destination)) {
-        echo "Saved the {$fullPath} as {$fileName}";
+        $lastInsertIdOrError = addEntry($extension, $originalName);
+        if ($lastInsertIdOrError === $id) {
+            echo "Saved \"{$fullPath}\" as \"{$fileName}\"";
+        } else {
+            http_response_code(500);
+            echo "Error! Instead of last insert id ($id) get the: {$lastInsertIdOrError}";
+        }
     } else {
-        echo 'Failed to save!';
+        http_response_code(500);
+        echo 'Failed to save the file!';
     }
 }
