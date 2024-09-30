@@ -5,6 +5,16 @@ require_once 'db-env.php'; // $dbName = 'db.sqlite';
 
 $pdo = new PDO('sqlite:' . __DIR__ . '/' . $dbName);
 
+function getAllEntries() {
+    try {
+        global $pdo;
+        $query = 'SELECT * FROM playlist';
+        return $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    } catch (\Throwable $th) {
+        return json_encode($th);
+    }
+}
+
 function getLastEntry() {
     try {
         global $pdo;

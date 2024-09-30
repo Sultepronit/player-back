@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once 'db/crud.php';
+require_once 'services/dataFormatters.php';
 
 header('Access-Control-Allow-Origin: *');
 
@@ -15,8 +16,17 @@ $path = str_replace('/player', '', $reqUri);
 
 $audioDir = __DIR__ . '/audio';
 
-if($method === 'GET' && $path === '/list') {
+if($method === 'GET' && $path === '/list0') {
     $list = array_slice(scandir($audioDir), 2);
+    header('Content-Type: application/json');
+    echo json_encode($list);
+    exit;
+}
+
+if($method === 'GET' && $path === '/list') {
+    $rawData = getAllEntries();
+    $list = formateDataFromDb($rawData);
+
     header('Content-Type: application/json');
     echo json_encode($list);
     exit;
@@ -25,7 +35,7 @@ if($method === 'GET' && $path === '/list') {
 if ($method === 'GET' && str_starts_with($path, '/files')) {
     $filePath = str_replace('/files', $audioDir, $path);
 
-    $filePath = str_replace('_', '.', $filePath);
+    // $filePath = str_replace('_', '.', $filePath);
 
     if (!file_exists($filePath)) {
         echo 'Nothing here!';
