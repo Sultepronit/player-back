@@ -16,13 +16,6 @@ $path = str_replace('/player', '', $reqUri);
 
 $audioDir = __DIR__ . '/audio';
 
-if($method === 'GET' && $path === '/list0') {
-    $list = array_slice(scandir($audioDir), 2);
-    header('Content-Type: application/json');
-    echo json_encode($list);
-    exit;
-}
-
 if($method === 'GET' && $path === '/list') {
     $rawData = getAllEntries();
     $list = formateDataFromDb($rawData);
@@ -35,9 +28,10 @@ if($method === 'GET' && $path === '/list') {
 if ($method === 'GET' && str_starts_with($path, '/files')) {
     $filePath = str_replace('/files', $audioDir, $path);
 
-    // $filePath = str_replace('_', '.', $filePath);
+    $filePath = str_replace('_', '.', $filePath);
 
     if (!file_exists($filePath)) {
+        http_response_code(404);
         echo 'Nothing here!';
         exit;
     }

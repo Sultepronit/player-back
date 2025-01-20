@@ -5,7 +5,9 @@ function formateRowFromDb($row) {
     return [
         'id' => $row['id'],
         'filename' => "{$row['id']}.{$row['extension']}",
-        'originalFilename' => $row['original_name']
+        'originalFilename' => $row['original_name'],
+        'description' => $row['description'],
+        'rating' => $row['rating']
     ];
 }
 
